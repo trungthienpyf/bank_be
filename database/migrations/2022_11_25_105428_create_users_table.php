@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('phone');
             $table->string('fullName');
             $table->text('token')->nullable();
-            $table->string('accountNumber')->nullable();
+            $table->bigInteger('accountNumber')->nullable()->unsigned()->unique();
             $table->timestamps();
         });
     }

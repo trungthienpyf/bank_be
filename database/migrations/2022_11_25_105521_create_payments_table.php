@@ -18,7 +18,8 @@ class CreatePaymentsTable extends Migration
             $table->string('amount');
             $table->text('description')->nullable();
             $table->string('toAcc');
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('fromAcc')->references('accountNumber')->on('users');
+
             $table->timestamps();
         });
     }

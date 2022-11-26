@@ -194,11 +194,30 @@ trait RefeshTokenTrait
             'fromAc' => $fromAc,
         ]);
         $user = User::where('id', $id)->first();
-        $sum=   $user->money - $amount;
+        $sum = $user->money - $amount;
         $user->update(['money' => $sum]);
         return $amount;
     }
 
+    public function getHistory($accountNo)
+    {
+        $data = [
+            "data" => [
+                "acctNo" => $accountNo,
+                "fromDate" => '23012021',
+                "toDate" => '30012021',
+
+            ],
+            "request" => [
+                "requestId" => "a7ea23df-7468-439d-9b12-26eb4a760901",
+                "requestTime" => "1667200102200"
+            ]
+        ];
+        return Http::withHeaders([
+            'access-token' => $this->tokenAccess,
+            'x-api-key' => 'hutech_hackathon@123456'
+        ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/tranhis', $data);
+    }
 
     public function getMoney($accountNo)
     {
