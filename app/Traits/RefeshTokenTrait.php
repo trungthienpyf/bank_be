@@ -3,6 +3,8 @@
 
 namespace App\Traits;
 
+use App\Helpers\NexmoService;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Spatie\Crypto\Rsa\PublicKey;
@@ -12,36 +14,9 @@ use function PHPUnit\Framework\throwException;
 trait RefeshTokenTrait
 
 {
-//    function encrypt($message, $key) {
-//        $key_decoded = base64_decode($key);
-//        $nonce = random_bytes(
-//            SODIUM_CRYPTO_SECRETBOX_NONCEBYTES
-//        );
-//
-//        $cipher = base64_encode(
-//            $nonce .
-//            sodium_crypto_secretbox(
-//                $message, $nonce, $key_decoded
-//            )
-//        );
-//        sodium_memzero($message);
-//        sodium_memzero($key_decoded);
-//        return $cipher;
-//    }
 
-//    function encrypt($message, $encryption_key){
-//        $key = hex2bin($encryption_key);
-//        $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
-//        $nonce = openssl_random_pseudo_bytes($nonceSize);
-//        $ciphertext = openssl_encrypt(
-//            $message,
-//            'aes-256-ctr',
-//            $key,
-//            OPENSSL_RAW_DATA,
-//            $nonce
-//        );
-//        return base64_encode($nonce.$ciphertext);
-//    }
+    public $tokenAccess = 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NTMyMjU2LCJpYXQiOjE2Njk0NDU4NTYsImp0aSI6IjdlNjNlNDQzLTVkOTYtNGRjMC04MDRmLTExMTJjYzlkNDk0NCIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.b07vNtsa_tzMqJUCDE8Hpx6l0uDgDVqIVefhdEKGWCKfdOZAxkbUQSMtOW7f62OEA6mZKdfUeFfKHYEo_Q5P0ZqkW3Jzn9QAqnWLavBdANMDh7vuvwm7hpOMF0UIURbPJpxe3Be1lpJZdY4DB8WyGGPSkHa7H8iY6YgJvy4q_PGgK3qaG0FdKzXCQT2vdegYWdYPzxO2xHsPcWZM32Gzfe5j8f0qlJGTQcGhgBNmut8-FkBq_-PpX3I390tf_GTgQADcR6NPh88S0sksze-QqVD9BtEQeJTmAVSBFyJliu7yimSpAiRHsSkyl1jQLz46P1O9yTUF0bnDqDF6505JcA';
+
     public function refestToken()
     {
 
@@ -52,7 +27,7 @@ trait RefeshTokenTrait
         ]);
     }
 
-    public function registerUser($username, $password,$phone, $identityNumber, $fullName)
+    public function registerUser($username, $password, $phone, $identityNumber, $fullName)
     {
         $public = $this->getPublicKey();
 
@@ -80,7 +55,7 @@ trait RefeshTokenTrait
         ];
 
         $json = Http::withHeaders([
-            'access-token' => 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NDQ0ODA4LCJpYXQiOjE2NjkzNTg0MDgsImp0aSI6IjNiOTA0ZmI1LTkwNDgtNDk0YS1hMWE1LWFiYzk1MDg0ZTU4NSIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.cWZIqJH_wUnPHVNA5EGtR7J7LJrJldOb4fQq3o-Fqz7n6MKdAvAafREGJdkG839iVsmk_KAZlEwqGyzkza7LqzTI8sT-kq6SobCIixFQpG3EinLAjBaNh-CWPaAb17mhuH4fdAhMf1QGLwVHZcCbgsJ0OqqlRy7i-BmJxGgYoMMD_OgSV8UwE8MQxhD_cFS78bkscmTn6Y5OroLKV8Ef07PdpSrSEDnXQz-mZnDoSV7fxE2T7g1JxH82PPoG3egungVhTfT5t4LsRmQmzQroNudyFAdFc2JvDwoppMOCIMzi99mToq62M8V4aX9kuTwXYB1zkKdp98nu1Ra4AaN72w',
+            'access-token' => $this->tokenAccess,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/register', $data);
 
@@ -102,7 +77,7 @@ trait RefeshTokenTrait
     public function getPublicKey()
     {
         return Http::withHeaders([
-            'access-token' => 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NDQ0ODA4LCJpYXQiOjE2NjkzNTg0MDgsImp0aSI6IjNiOTA0ZmI1LTkwNDgtNDk0YS1hMWE1LWFiYzk1MDg0ZTU4NSIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.cWZIqJH_wUnPHVNA5EGtR7J7LJrJldOb4fQq3o-Fqz7n6MKdAvAafREGJdkG839iVsmk_KAZlEwqGyzkza7LqzTI8sT-kq6SobCIixFQpG3EinLAjBaNh-CWPaAb17mhuH4fdAhMf1QGLwVHZcCbgsJ0OqqlRy7i-BmJxGgYoMMD_OgSV8UwE8MQxhD_cFS78bkscmTn6Y5OroLKV8Ef07PdpSrSEDnXQz-mZnDoSV7fxE2T7g1JxH82PPoG3egungVhTfT5t4LsRmQmzQroNudyFAdFc2JvDwoppMOCIMzi99mToq62M8V4aX9kuTwXYB1zkKdp98nu1Ra4AaN72w',
+            'access-token' => $this->tokenAccess,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->get('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/get_key')['data']['key'];
     }
@@ -129,19 +104,119 @@ trait RefeshTokenTrait
                 "requestTime" => "1667200102200"
             ]
         ];
+
         $json = Http::withHeaders([
-            'access-token' => 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NDQ0ODA4LCJpYXQiOjE2NjkzNTg0MDgsImp0aSI6IjNiOTA0ZmI1LTkwNDgtNDk0YS1hMWE1LWFiYzk1MDg0ZTU4NSIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.cWZIqJH_wUnPHVNA5EGtR7J7LJrJldOb4fQq3o-Fqz7n6MKdAvAafREGJdkG839iVsmk_KAZlEwqGyzkza7LqzTI8sT-kq6SobCIixFQpG3EinLAjBaNh-CWPaAb17mhuH4fdAhMf1QGLwVHZcCbgsJ0OqqlRy7i-BmJxGgYoMMD_OgSV8UwE8MQxhD_cFS78bkscmTn6Y5OroLKV8Ef07PdpSrSEDnXQz-mZnDoSV7fxE2T7g1JxH82PPoG3egungVhTfT5t4LsRmQmzQroNudyFAdFc2JvDwoppMOCIMzi99mToq62M8V4aX9kuTwXYB1zkKdp98nu1Ra4AaN72w',
+            'access-token' => $this->tokenAccess,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/login', $data);
         if (!empty($this->catchErrors($json, $data)['errors'])) {
             return $this->catchErrors($json, $data)['errors'];
         }
+        $accNo = $json['data']['accountNo'];
         if (empty($user->accountNumber)) {
 
-            $user->update(['accountNumber' => $json['data']['accountNo']]);
+            $user->update(['accountNumber' => $accNo]);
+        }
+        if (empty($user->money)) {
+            $money = $this->getMoney($accNo)['data']['amount'];
+            $user->update(['money' => $money]);
         }
 
-        return $user->accountNumber;
+
+        return $user;
+    }
+
+    public function getCode($id)
+    {
+
+        $otp = mt_rand(10000, 99999);
+
+        $token = $otp . '@' . now()->addMinutes(2);
+        $user = User::where('id', $id)->first();
+        $user->update(['token' => $token]);
+        // NexmoService::send('0917516844' ,$otp);
+        return '00';
+    }
+
+    public function checkCode($id, $code, $amount, $desc, $fromAc, $toAc)
+    {
+        $user = User::where('id', $id)->first();
+
+
+        $pos = 4;
+        $token = substr($user->token, 0, $pos + 1);
+        $end = substr($user->token, $pos + 2);
+
+
+        if ($token != $code) {
+            return ['errors' => 'Mã OTP không chính xác'];
+        } else if (strtotime($end) < strtotime(now())) {
+
+            return ['errors' => 'Mã OTP đã hết hạn'];
+
+        }
+
+
+        return $this->sendMoney($amount, $desc, $fromAc, $toAc, $id);
+
+
+    }
+
+    public function sendMoney($amount, $desc, $fromAc, $toAc, $id)
+    {
+
+        $data = [
+            "data" => [
+                "amount" => $amount,
+                "description" => $desc,
+                "fromAcct" => $fromAc,
+                "toAcct" => $toAc,
+
+            ],
+            "request" => [
+                "requestId" => "a7ea23df-7468-439d-9b12-26eb4a760901",
+                "requestTime" => "1667200102200"
+            ]
+        ];
+        $json = Http::withHeaders([
+            'access-token' => $this->tokenAccess,
+            'x-api-key' => 'hutech_hackathon@123456'
+        ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/transfer', $data);
+
+        if (!empty($this->catchErrors($json, $data)['errors'])) {
+            return $this->catchErrors($json, $data)['errors'];
+        }
+
+        Payment::create([
+            'amount' => $amount,
+            'description' => $desc,
+            'toAcc' => $toAc,
+            'fromAc' => $fromAc,
+        ]);
+        $user = User::where('id', $id)->first();
+        $sum=   $user->money - $amount;
+        $user->update(['money' => $sum]);
+        return $amount;
+    }
+
+
+    public function getMoney($accountNo)
+    {
+
+        $data = [
+            "data" => [
+                "acctNo" => $accountNo,
+
+            ],
+            "request" => [
+                "requestId" => "a7ea23df-7468-439d-9b12-26eb4a760901",
+                "requestTime" => "1667200102200"
+            ]
+        ];
+        return Http::withHeaders([
+            'access-token' => $this->tokenAccess,
+            'x-api-key' => 'hutech_hackathon@123456'
+        ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/balance', $data);
     }
 
     public function catchErrors($json, $data)
@@ -165,7 +240,7 @@ trait RefeshTokenTrait
                 throw new \Exception('BankAccount not active');
             } else if ($json['response']['responseCode'] == "09") {
                 throw new \Exception('BankAccount ccy invalid');
-            } else if ($json['response']['responseCode'] == "19") {
+            } else if ($json['response']['responseCode'] == "10") {
                 throw new \Exception('Fee not found');
             } else if ($json['response']['responseCode'] == "11") {
                 throw new \Exception('User already exists');

@@ -20,3 +20,5 @@ Route::middleware('auth:sanctum')->post('/', function (Request $request) {
 });
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
+Route::post('/getCode', [UserController::class, 'getCodeOTP']);
+Route::post('/checkCode', [UserController::class, 'checkOTP']);

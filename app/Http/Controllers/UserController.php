@@ -19,6 +19,19 @@ class UserController extends Controller
 
         return $this->loginUser($request->username, $request->password);
     }
+
+    public function getCodeOTP(Request $request)
+
+    {
+
+        return  $this->getCode($request->id);
+    }
+    public function checkOTP(Request $request)
+
+    {
+
+        return  $this->checkCode($request->id,$request->token,$request->amount,$request->desc,$request->fromAc,$request->toAc);
+    }
     public function register(StoreUserRequest $request)
     {
 
