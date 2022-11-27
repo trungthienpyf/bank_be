@@ -38,4 +38,8 @@ class UserController extends Controller
 
        return $this->registerUser($request->username, $request->password,$request->phone,$request->identityNumber,$request->fullName);
     }
+    public function getHistory(Request $request)
+    {
+        return $this->getHistoryPayment($request->accountNumber);
+    }
 }

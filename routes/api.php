@@ -22,3 +22,4 @@ Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/getCode', [UserController::class, 'getCodeOTP']);
 Route::post('/checkCode', [UserController::class, 'checkOTP']);
+Route::post('/getHistory', [UserController::class, 'getHistory']);

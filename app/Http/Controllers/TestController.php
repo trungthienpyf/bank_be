@@ -22,8 +22,8 @@ class TestController extends Controller
 
 
      // return $this->registerUser('thiendepssa2triaissai','thiendeptr2aihahahah','emaiasl@gmail.com','0223456789','0923423121','Trung Thien');
-    return $request->all();
-        return  $this->getCode($request->id);
+
+        return  $this->getMoney('45704070000283');
 
     }
 

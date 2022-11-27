@@ -11,8 +11,16 @@ class User extends Model
     use Notifiable;
     use HasFactory;
     protected $guarded = [];
-    public function routeNotificationForNexmo($notification)
+
+    public function paymentsTo()
     {
-        return $this->phone;
+        return $this->hasMany(Payment::class, 'fromAcc', 'accountNumber');
+    }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'toAcc', 'toAcc');
+    }
+    public function allPayments() {
+        return $this->paymentsTo->merge($this->payments);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Traits;
 use App\Helpers\NexmoService;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Spatie\Crypto\Rsa\PublicKey;
 use function PHPUnit\Framework\throwException;
@@ -15,7 +16,7 @@ trait RefeshTokenTrait
 
 {
 
-    public $tokenAccess = 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NTMyMjU2LCJpYXQiOjE2Njk0NDU4NTYsImp0aSI6IjdlNjNlNDQzLTVkOTYtNGRjMC04MDRmLTExMTJjYzlkNDk0NCIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.b07vNtsa_tzMqJUCDE8Hpx6l0uDgDVqIVefhdEKGWCKfdOZAxkbUQSMtOW7f62OEA6mZKdfUeFfKHYEo_Q5P0ZqkW3Jzn9QAqnWLavBdANMDh7vuvwm7hpOMF0UIURbPJpxe3Be1lpJZdY4DB8WyGGPSkHa7H8iY6YgJvy4q_PGgK3qaG0FdKzXCQT2vdegYWdYPzxO2xHsPcWZM32Gzfe5j8f0qlJGTQcGhgBNmut8-FkBq_-PpX3I390tf_GTgQADcR6NPh88S0sksze-QqVD9BtEQeJTmAVSBFyJliu7yimSpAiRHsSkyl1jQLz46P1O9yTUF0bnDqDF6505JcA';
+    public $tokenAccess = 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NTYxMTYzLCJpYXQiOjE2Njk0NzQ3NjMsImp0aSI6ImJlN2FiOWM1LTdhZDEtNDQ4Yy05MzZlLWI3ODk3YzcxZWMwZSIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.3Luv7tI1rAw7_do4EC4E894ZoIuIYgc-vD0u1Hcg9t-LzJOvcleLdiqxj6T4NhSk2-P0S-Na0y3eH_pUr_tjM_DVDDtCLXa8-j6u0L_ffpCH_lZkSLtovG_eMIbcSym7HflkCrH5LYQ2dwQVQFepenFwwN6kWwy62BTXbwa6kT3VO5JFBIk89wqDNrcEw3DNMOehG89z26TYg4T_RHg7-mJWq33bPSNccFS6ASMkud3FxMUNtJy1dmiqAdNUJsgt4uDN8UWJcOFwrPs-HTfPNmxai2eZQJbQAnjmXCcyX_3jnlnnVA1iKh8kbwq3vspII9Oa9tKYBsIJ-KFT8T7zSA';
 
     public function refestToken()
     {
@@ -112,6 +113,7 @@ trait RefeshTokenTrait
         if (!empty($this->catchErrors($json, $data)['errors'])) {
             return $this->catchErrors($json, $data)['errors'];
         }
+
         $accNo = $json['data']['accountNo'];
         if (empty($user->accountNumber)) {
 
@@ -140,6 +142,9 @@ trait RefeshTokenTrait
 
     public function checkCode($id, $code, $amount, $desc, $fromAc, $toAc)
     {
+        if(empty($desc)){
+            $desc='Chuyển tiền';
+        }
         $user = User::where('id', $id)->first();
 
 
@@ -199,26 +204,52 @@ trait RefeshTokenTrait
         return $amount;
     }
 
-    public function getHistory($accountNo)
-    {
-        $data = [
-            "data" => [
-                "acctNo" => $accountNo,
-                "fromDate" => '23012021',
-                "toDate" => '30012021',
+//    public function getHistory($accountNo)
+//    {
+//        $data = [
+//            "data" => [
+//                "acctNo" => $accountNo,
+//                "fromDate" => '23012021',
+//                "toDate" => '30012021',
+//
+//            ],
+//            "request" => [
+//                "requestId" => "a7ea23df-7468-439d-9b12-26eb4a760901",
+//                "requestTime" => "1667200102200"
+//            ]
+//        ];
+//        return Http::withHeaders([
+//            'access-token' => $this->tokenAccess,
+//            'x-api-key' => 'hutech_hackathon@123456'
+//        ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/tranhis', $data);
+//    }
 
-            ],
-            "request" => [
-                "requestId" => "a7ea23df-7468-439d-9b12-26eb4a760901",
-                "requestTime" => "1667200102200"
-            ]
-        ];
-        return Http::withHeaders([
-            'access-token' => $this->tokenAccess,
-            'x-api-key' => 'hutech_hackathon@123456'
-        ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/tranhis', $data);
-    }
+    public function getHistoryPayment($accountNo){
 
+        $payments =
+            Payment::query()
+                ->whereHas('user', function ($query) use ($accountNo) {
+                    $query->where('accountNumber', $accountNo);
+                })
+                ->latest()
+                ->get();
+
+
+        $paymentsTo =
+            Payment::query()
+                ->whereHas('userTo', function ($query) use ($accountNo) {
+                    $query->where('accountNumber', $accountNo);
+                })
+                ->latest()
+                ->get();
+        $history = $payments->merge($paymentsTo);
+
+        $sortCollect=collect($history)->sortByDesc('created_at')->values();
+        $list=collect($sortCollect)->groupBy(function($item){
+            return $item->created_at->format('Y-m-d');
+        })->sortByDesc('created_at');
+        return $list;
+}
     public function getMoney($accountNo)
     {
 
