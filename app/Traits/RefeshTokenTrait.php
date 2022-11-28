@@ -6,27 +6,29 @@ namespace App\Traits;
 use App\Helpers\NexmoService;
 use App\Models\Payment;
 use App\Models\User;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Spatie\Crypto\Rsa\PublicKey;
-use function PHPUnit\Framework\throwException;
+
 
 
 trait RefeshTokenTrait
 
 {
 
-    public $tokenAccess = 'eyJraWQiOiJXcDRGMndiQVpMa1d2WWgyNDhnYjNtUHBLRzZTdDRNcG85Tmc3U2diZ2E0PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmFwLXNvdXRoZWFzdC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoZWFzdC0xX1FiMVE4VFBzVSIsImNvZ25pdG86dXNlcm5hbWUiOiJmMjY1N2MxNy04ZTdlLTQ3YjItYTk4OS1jZDNlMjY0YWY4ZjgiLCJvcmlnaW5fanRpIjoiOGM5NWFkYzgtMWU0ZS00ODYxLWFkODUtY2YyOGNkYWIwYTRhIiwiYXVkIjoic2lrY25laTR0MmgzbnRrcWo1ZDQ5bHR2ciIsImV2ZW50X2lkIjoiNzJjMTY3NGEtNTUxOC00N2M0LTgxZDktNDQxNjUyNTYwMmJkIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NjkxMjk5MzQsIm5hbWUiOiJUcnVuZyBUaGnhu4duIiwiZXhwIjoxNjY5NTYxMTYzLCJpYXQiOjE2Njk0NzQ3NjMsImp0aSI6ImJlN2FiOWM1LTdhZDEtNDQ4Yy05MzZlLWI3ODk3YzcxZWMwZSIsImVtYWlsIjoiMjY5LnRkZEBnbWFpbC5jb20ifQ.3Luv7tI1rAw7_do4EC4E894ZoIuIYgc-vD0u1Hcg9t-LzJOvcleLdiqxj6T4NhSk2-P0S-Na0y3eH_pUr_tjM_DVDDtCLXa8-j6u0L_ffpCH_lZkSLtovG_eMIbcSym7HflkCrH5LYQ2dwQVQFepenFwwN6kWwy62BTXbwa6kT3VO5JFBIk89wqDNrcEw3DNMOehG89z26TYg4T_RHg7-mJWq33bPSNccFS6ASMkud3FxMUNtJy1dmiqAdNUJsgt4uDN8UWJcOFwrPs-HTfPNmxai2eZQJbQAnjmXCcyX_3jnlnnVA1iKh8kbwq3vspII9Oa9tKYBsIJ-KFT8T7zSA';
 
-    public function refestToken()
+    public function refreshToken()
     {
+        $string='client_id=sikcnei4t2h3ntkqj5d49ltvr&grant_type=refresh_token&refresh_token=eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.jvk-LNbQtUrf4Kra912NuJqW-43EdEbzDLEzJhQ4Hts5YV8mDw1TYK2Eqi68ZjdpjM9aVLkqUw4Cky8mO0pwueg1888CUCRq1SB3wkIz-IvkbHR21mfYG94hBJt1Pwo956H_YKZl7TmVfV_tYIPaDx5c6sStH95J7Bdy6toamXRWPjFaq3YvVuJyFoaogfUnvPaMZa0PEe8rzyHWyw5_sia9UlqgQqHkB_jszyvMfsK1ef6-vDChA-kTr6FVwjlmwTSanLzn0c2vvAw22VWt6kYD7aCibakT96SlBYM2qMNJ94b4OmXILX7_eJ2OnK71joIWXuB5Kw9cM7NZqKmvMA.u6KiZfI4Q8yftcJY.10Mn0qi4MHf5_YJ7wxUD5GqmYR1NLrFe4KZtmNw09bLExrtolHGbS5mZLt3Nb-20WH3AyhaQdL21eNt637DXmCgLyQvlNhbQ1OvgtuxyM_gY4SojM8D0vonLhv3IMXod5cvoJOlzwXMCheRpS9WjJxzbd20qjuHBjGXH-kSzF9PXnieSWUwil3HrJ9AGIcN2zQ_0fufIwoyMp31r-fDAv2g92DQQzqS-GoZ8xdpfa3QwKfEuhXLjOE5gs5XAOD57i_mlvbOUTJZNLX8K4v5WnFBywMOFshTNySmYtntsUM5_B3Baxg7Zr67AOfqx6qrih2nX5NZ2U-NhtEzq1_aFcfCCnM5Qhn4ev3uMeHPCOnjyvicTxWgidaH5MtciVDxFGXYTVXM0guSJnNS6xC9GNLy5zO1pS6AElJS4k4DrDrw59JexUbNMj7_CGRZ80GzhS3YOxTqvpnz9guXnq2SEcf_nB8WXJPdim7epTINzxzMmT_5l9wCqci8KHT0WQJpVTQaXBE8gMJY7WjAgfBiSZ0vD3iIm02h3p0uFuQNk0V-NyrQ9fgeixoSHk6z2v-wU_fXN8eYAAacRmcJZ439t8x66B6H7qCEDmjWSzkLMd-6WYupTHH-ZAsR-WzGFmkv5tKM7rr2t7ibwOIZFyLkXY5YiVE8VqamEuiMtG1KGRtm5iiaNRgDzxhcTi6fc_ACiRKZ6t8vpqo7dsDQUBFsXuWgsC9kGHX9cFnQnnTuCmVo_cNC8F7LIndA1d3RNsrXI8uURjo2wtoHCtFjUtR5NheMAbQUVo8Tg33HW368FCRCODzfmz_37ZNPEGyFYsMwaqITS5nF1grfuMsWvweU1lwgvMQf32M1rp8GZNEp-DzPIf7kkpGKnF38D94rcfueZGuFVL6vHsIG5UJp6nXefoyVe_wx1PeQXbWRorCVOVutpJSXUpZ3EyytW3GdIh3kP2rlhsxkAr9hxf8i1XXupySHFsCIgJq8h-ivtUsO4IJfMYJOO8sS8xLmkBbkdGzxKw0gNtlsQl_xZCw6OGwyIS9DY5mdSOSmOi9YOLQvCnrvIFlSS2-839ua91QuvIvNFBgvc-I_Xze9bHM5e1wLor2d93a0gqutCiOw-mCM4bjIG9jBr0SjkvHJVS_bkv6saF17MSwK08PXdMx1nskCRr-SmO2jA9doc4Kt3kIesPC1psNd30-DKzlMmmGMDVYBIIF18pGz1CxQqDi7LR3rPD1uFkB3FuKjnj_7Fv3gCxSs7pc96-Oy6fKDhqLI7HAGon47o4mXYPEoLKPTtdK0SjIz37otcDiq9lEp-4XJ4qzHNzrbDSQ63m0fr5_uxuJDZCq3k8VFbNA.zkuaFR6fwP0KkRVt5ILsEQ';
+      $newToken=   Http::asForm()->withBody(  $string,'' )->post('https://hdbank-hackathon.auth.ap-southeast-1.amazoncognito.com/oauth2/token')['id_token'];
 
-        Http::asForm()->post('https://hdbank-hackathon.auth.ap-southeast-1.amazoncognito.com/oauth2/token', [
-            'client_id ' => 'sikcnei4t2h3ntkqj5d49ltvr',
-            'grant_type  ' => 'refresh_token',
-            'refresh_token ' => 'eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.XbWKI-ObhFD9Puj9plhfgjfXIgS9OKpaKniuu0UbskrxBypygWrwsO56ZKVvEY_PC7i4MdacS8SlXFFNnWvVXSbdjwnSAdx_AVUwgYbljpeEiMPiqBk5UGGUE96FXNY_dm_OkS0LDgFfuOa6usym-zKL1AC6EDupoN4QaWCQK2CLhJKnkc7fFfAz2tK2HPZLXyciJA5rlzndUkMZA6lOKQxOBXSWE6ytzFiRKGWmMMtnozK2NtqGknmq0_rAv2aa83RUKzJod3dyxNLt8Uh64YF5w0wwamxrPGd1U9rZRrhlyQkJJEM38AF-OjWZE3Yktpx9Z1sZagnmEBbjy8VX8g.t7axQ27zS0pAj2YG.iPp4JG0agvkajvHvXPsgZ6D2YD1L1LrFjMzYxCP45Nfzgqn7ybcZ_l8jQyQwFkupAAZTD4GO-K3fUhqDrvbrEzd1NGizQ4yYc4USL8QqOq1u6bzMjxXAhkO_Hj4wsnZbtlStMueQq8UsBAcxhIvV6t8Docvk2FS4wtpdA7K0heP8nKKw1HUMh_5g6NO5Bfpgf6XEgHcy1XtzYdKSd9d0XyUbWEKZMF09x9a4zqRuMfshILZqOvVqsf7IxHDi4r7NhcMYfuRTHWw1PGwTjP5tskYyRJv3Y_xzh5SZVNkyBzPvKdoMNPj7EMRDPUJWi5_l8iDHf21UzW-KqjF775bimS3YL--dUWNyxdiDoevOOppA3w8JDZltBQlNgu49Ko-pjtuOPwHCTS1oJ08fjxzs_3O-5FsRX1m5IqRMfyItrjShW1iW1-DM9HHXUN8_i4zJdCSr7jcDYBo1OCV7WhvAvd-xnvtztN1ZTYTc5TJrDW4VtWtYWb-580tagFrgNF0WObmAwk211uusCiVt1l4SPAVhVaXScYmAF58H0RFC36YT2zISwpxvr9OzCsoSR0WV95bPKIu1TpNd1mTJjCj2UwT3o_nxw4pnbZSecctWFmiMZJhtny--alKQ8_AKu8_424xjPVVVHklCb5pmzBKRNOW8KnuN8t4AyI3NIipRWESRvghL8VbpUTqID_9hwxsut3X_0F7givv5YeOG_UkgyRDCuL5sG0ZpSMi7-xjfZ8UjQaepLBtThT-__lEPjvhsKN1WCCbG5ghc-7HqyUYFojG3pxf5O3FIuj3gdjXMxbIyrSLNVYC0uGcygFt0RuR9arqeQB_3Gk-WtUrZt1qRsJIruckrPLNT0G3MbHbJtPrPxeQ-pmHQafgdEzkBaXLMN3tFkgAzum21mrvKxFNb-p4Vs1SYZUtbcBbEY2C3UvMElQAGkMvgj5JdvxApjcollKU9QpR-6DrnF7IuvIzKJcSTKHsmvLfRsdeFPM26olgq1ixjCP3kYUKEaPJCxMQtlHZ_b_XAC2qjw2TkLPpiBen3wlg41BB6PmXmIV94IxsfUyQaYpvafRqQ9T_IrtUxfoRSPjANJWBteP1Ed6F_QzzgPmXno8t9DyngAkHFufniY1FCpjGB8qGA2dTmI64GknqVf1I0Q_AYj21vbobWmIH73MT9tBOpWHi9KWPsaZTFQn6SFtqvKVxA_huKnmVhwPJI7HT0bDbz0nmPJY0hXZ1XWoClFBBzhLBOM_Y9omKe-l34ctSm-bOcTrH72fGkfcwiXnHVkfXTZmkkbAje6YEAcujP15I3qNr6DtdcrZTxm451EvRNlyLQ0UE_83eDeb66RVGVXuoB.QcmPOSTo-ljPwcMa-Q33BA',
-        ]);
+      Cache::put('access_token', $newToken, 86400);
+      return  Cache::get('access_token');
     }
+
+
 
     public function registerUser($username, $password, $phone, $identityNumber, $fullName)
     {
@@ -39,6 +41,13 @@ trait RefeshTokenTrait
         openssl_public_encrypt($data, $encrypted, $final, OPENSSL_PKCS1_PADDING);
 
         $encrypted = base64_encode($encrypted);
+        $access_tk='';
+        if (Cache::get('access_token')) {
+
+            $access_tk = Cache::get('access_token');
+        } else {
+           $access_tk= $this->refreshToken();
+        }
 
         $data = [
             "data" => [
@@ -56,7 +65,7 @@ trait RefeshTokenTrait
         ];
 
         $json = Http::withHeaders([
-            'access-token' => $this->tokenAccess,
+            'access-token' => $access_tk,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/register', $data);
 
@@ -77,14 +86,30 @@ trait RefeshTokenTrait
 
     public function getPublicKey()
     {
+        $access_tk='';
+        if (Cache::get('access_token')) {
+
+            $access_tk = Cache::get('access_token');
+        } else {
+            $access_tk= $this->refreshToken();
+        }
+
         return Http::withHeaders([
-            'access-token' => $this->tokenAccess,
+            'access-token' => $access_tk,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->get('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/get_key')['data']['key'];
     }
 
     public function loginUser($username, $password)
     {
+
+        $access_tk='';
+        if (Cache::get('access_token')) {
+
+            $access_tk = Cache::get('access_token');
+        } else {
+            $access_tk= $this->refreshToken();
+        }
 
         $user = User::query()
             ->where('username', $username)
@@ -106,10 +131,12 @@ trait RefeshTokenTrait
             ]
         ];
 
+
         $json = Http::withHeaders([
-            'access-token' => $this->tokenAccess,
+            'access-token' => $access_tk,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/login', $data);
+
         if (!empty($this->catchErrors($json, $data)['errors'])) {
             return $this->catchErrors($json, $data)['errors'];
         }
@@ -142,8 +169,8 @@ trait RefeshTokenTrait
 
     public function checkCode($id, $code, $amount, $desc, $fromAc, $toAc)
     {
-        if(empty($desc)){
-            $desc='Chuyển tiền';
+        if (empty($desc)) {
+            $desc = 'Chuyển tiền';
         }
         $user = User::where('id', $id)->first();
 
@@ -169,6 +196,12 @@ trait RefeshTokenTrait
 
     public function sendMoney($amount, $desc, $fromAc, $toAc, $id)
     {
+        $access_tk='';
+        if (Cache::get('access_token')) {
+            $access_tk = Cache::get('access_token');
+        } else {
+            $access_tk= $this->refreshToken();
+        }
 
         $data = [
             "data" => [
@@ -184,7 +217,7 @@ trait RefeshTokenTrait
             ]
         ];
         $json = Http::withHeaders([
-            'access-token' => $this->tokenAccess,
+            'access-token' => $access_tk,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/transfer', $data);
 
@@ -224,7 +257,8 @@ trait RefeshTokenTrait
 //        ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/tranhis', $data);
 //    }
 
-    public function getHistoryPayment($accountNo){
+    public function getHistoryPayment($accountNo)
+    {
 
         $payments =
             Payment::query()
@@ -244,14 +278,21 @@ trait RefeshTokenTrait
                 ->get();
         $history = $payments->merge($paymentsTo);
 
-        $sortCollect=collect($history)->sortByDesc('created_at')->values();
-        $list=collect($sortCollect)->groupBy(function($item){
+        $sortCollect = collect($history)->sortByDesc('created_at')->values();
+        $list = collect($sortCollect)->groupBy(function ($item) {
             return $item->created_at->format('Y-m-d');
         })->sortByDesc('created_at');
         return $list;
-}
+    }
+
     public function getMoney($accountNo)
     {
+        $access_tk='';
+        if (Cache::get('access_token')) {
+            $access_tk = Cache::get('access_token');
+        } else {
+            $access_tk= $this->refreshToken();
+        }
 
         $data = [
             "data" => [
@@ -263,10 +304,12 @@ trait RefeshTokenTrait
                 "requestTime" => "1667200102200"
             ]
         ];
-        return Http::withHeaders([
-            'access-token' => $this->tokenAccess,
+        $json = Http::withHeaders([
+            'access-token' => $access_tk,
             'x-api-key' => 'hutech_hackathon@123456'
         ])->post('https://7ucpp7lkyl.execute-api.ap-southeast-1.amazonaws.com/dev/balance', $data);
+
+        return $json;
     }
 
     public function catchErrors($json, $data)
