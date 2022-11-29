@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,3 +24,5 @@ Route::post('/register', [UserController::class, 'register']);
 Route::post('/getCode', [UserController::class, 'getCodeOTP']);
 Route::post('/checkCode', [UserController::class, 'checkOTP']);
 Route::post('/getHistory', [UserController::class, 'getHistory']);
+Route::post('/storePost', [PostController::class, 'store']);
+Route::get('/getAllPost', [PostController::class, 'index']);
