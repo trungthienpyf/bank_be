@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -26,3 +27,5 @@ Route::post('/checkCode', [UserController::class, 'checkOTP']);
 Route::post('/getHistory', [UserController::class, 'getHistory']);
 Route::post('/storePost', [PostController::class, 'store']);
 Route::get('/getAllPost', [PostController::class, 'index']);
+Route::post('/sendAmount', [PostCommentController::class, 'store']);
+Route::post('/show', [PostCommentController::class, 'show']);

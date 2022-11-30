@@ -13,12 +13,13 @@ class CreatePostCommentsTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('post_comments');
         Schema::create('post_comments', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('post_id')->constrained();
             $table->string('amount');
-            $table->boolean('status');
-            $table->primary(['user_id','post_id']);
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }

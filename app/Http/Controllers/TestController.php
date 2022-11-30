@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 
 use App\Helpers\NexmoService;
+use App\Models\PostComment;
 use App\Models\User;
 use App\Notifications\SendSmsNotification;
 use App\Traits\RefeshTokenTrait;
@@ -31,7 +32,7 @@ class TestController extends Controller
 //            return '123123';
 //        });
 
-        return $this->refreshToken();
+        return PostComment::where('post_id',1)->latest()->get();
 
     }
 
