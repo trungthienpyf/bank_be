@@ -2,8 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Post;
-use App\Models\PostComment;
+
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -16,14 +15,18 @@ class MessagePosted implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public  $comment;
+    public  $user;
+    public  $message;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($comment)
+    public function __construct($comment,$user,$message)
     {
         $this->comment=$comment;
+        $this->user=$user;
+        $this->message=$message;
     }
 
     /**
@@ -33,6 +36,17 @@ class MessagePosted implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('post.'.$this->comment);
+
+        return new Channel('post.'.$this->comment);
+    }
+    public function broadcastWith()
+    {
+        return [
+
+            'user' => $this->user,
+            'message' => $this->message,
+            'post_id' => $this->comment,
+
+        ];
     }
 }

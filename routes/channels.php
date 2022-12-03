@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('post.{id}', function ($user, $id) {
+Broadcast::channel('post.{id}', function ($user) {
+
     return true; // user có thể join vào bất kì chatroom nào
 });

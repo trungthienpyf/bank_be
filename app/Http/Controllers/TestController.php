@@ -31,8 +31,8 @@ class TestController extends Controller
 //       $cache= Cache::remember('test', 10, function() {
 //            return '123123';
 //        });
-
-        return PostComment::where('post_id',1)->latest()->get();
+        $checkPost=  PostComment::query()->where('post_id','4')->latest()->first();
+        return  $checkPost;
 
     }
 
