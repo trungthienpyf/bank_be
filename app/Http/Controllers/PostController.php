@@ -12,7 +12,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
 
-        return  Post::all();
+        return  Post::query()->latest()->get();
     }
     public function store(Request $request)
     {

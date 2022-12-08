@@ -26,7 +26,7 @@ class PostCommentController extends Controller
         $message->save();
 
 
-        broadcast(new MessagePosted($request->post_id,$request->user_id,$request->amount));
+        broadcast(new MessagePosted($request->post_id,$request->user_id,$request->amount,$message->created_at));
 
         return $message->amount;
     }

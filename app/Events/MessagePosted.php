@@ -17,16 +17,18 @@ class MessagePosted implements ShouldBroadcast
     public  $comment;
     public  $user;
     public  $message;
+    public  $time;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($comment,$user,$message)
+    public function __construct($comment,$user,$message,$time)
     {
         $this->comment=$comment;
         $this->user=$user;
         $this->message=$message;
+        $this->time=$time;
     }
 
     /**
@@ -46,6 +48,7 @@ class MessagePosted implements ShouldBroadcast
             'user' => $this->user,
             'message' => $this->message,
             'post_id' => $this->comment,
+            'time' => $this->time,
 
         ];
     }
