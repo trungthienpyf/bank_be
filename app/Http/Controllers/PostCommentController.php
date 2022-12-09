@@ -30,25 +30,25 @@ class PostCommentController extends Controller
 
         return $message->amount;
     }
-    public function storeEndTime (Request $request) {
-      $checkPost=  PostComment::query()->with('post')->where('post_id',$request->post_id)->latest()->first();
-        $sum=PostComment::query()->where('post_id',$request->post_id)->sum('amount');
-        if(!empty($checkPost)){
-            $sum= $sum +$checkPost->post->amount;
-            $toAcc=User::where('id',$checkPost->post->user_id)->first();
-            $fromAcc=User::where('id',$checkPost->user_id)->first();
-
-            Payment::create([
-                'description'=>'Tiền đấu giá',
-                'amount'=>$sum,
-                'toAcc'=>$toAcc->accountNumber,
-                'fromAcc'=>$fromAcc->accountNumber,
-            ]);
-
-        }
-
-        return "Không có người đấu giá";
-    }
+//    public function storeEndTime (Request $request) {
+//      $checkPost=  PostComment::query()->with('post')->where('post_id',$request->post_id)->latest()->first();
+//        $sum=PostComment::query()->where('post_id',$request->post_id)->sum('amount');
+//        if(!empty($checkPost)){
+//            $sum= $sum +$checkPost->post->amount;
+//            $toAcc=User::where('id',$checkPost->post->user_id)->first();
+//            $fromAcc=User::where('id',$checkPost->user_id)->first();
+//
+//            Payment::create([
+//                'description'=>'Tiền đấu giá',
+//                'amount'=>$sum,
+//                'toAcc'=>$toAcc->accountNumber,
+//                'fromAcc'=>$fromAcc->accountNumber,
+//            ]);
+//
+//        }
+//
+//        return "Không có người đấu giá";
+//    }
     public function show (Request $request) {
 
 

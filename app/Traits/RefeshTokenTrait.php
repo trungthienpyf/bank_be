@@ -229,8 +229,10 @@ trait RefeshTokenTrait
             'amount' => $amount,
             'description' => $desc,
             'toAcc' => $toAc,
-            'fromAc' => $fromAc,
+            'fromAcc' => $fromAc,
         ]);
+        $userReceive = User::where('accountNumber', $toAc)->first();
+        $userReceive->update(['money' => $userReceive->money + $amount]);
         $user = User::where('id', $id)->first();
         $sum = $user->money - $amount;
         $user->update(['money' => $sum]);

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 
 
 use App\Helpers\NexmoService;
+use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\User;
 use App\Notifications\SendSmsNotification;
 use App\Traits\RefeshTokenTrait;
+use App\Traits\PostCommentTrait;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +21,7 @@ use Nexmo\Laravel\Facade\Nexmo;
 class TestController extends Controller
 {
     use RefeshTokenTrait;
+    use PostCommentTrait;
 
     public function test(Request $request)
     {
@@ -31,8 +34,8 @@ class TestController extends Controller
 //       $cache= Cache::remember('test', 10, function() {
 //            return '123123';
 //        });
-        $checkPost=  PostComment::query()->where('post_id','4')->latest()->first();
-        return  $checkPost;
+       $this->storeEndTime(78);
+
 
     }
 

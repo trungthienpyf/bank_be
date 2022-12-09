@@ -9,4 +9,12 @@ class Post extends Model
 {
     use HasFactory;
     protected $guarded= [];
+    public function postComments()
+    {
+        return $this->hasMany(PostComment::class);
+    }
+    public function lastPostComment()
+    {
+        return $this->hasOne(PostComment::class)->latest();
+    }
 }
