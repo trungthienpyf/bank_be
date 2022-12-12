@@ -14,6 +14,7 @@ use App\Traits\PostCommentTrait;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Nexmo\Laravel\Facade\Nexmo;
 
@@ -34,7 +35,8 @@ class TestController extends Controller
 //       $cache= Cache::remember('test', 10, function() {
 //            return '123123';
 //        });
-       $this->storeEndTime(78);
+
+         PostComment::query()->with('post')->get();
 
 
     }
