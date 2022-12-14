@@ -18,19 +18,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-    Route::post('/login', [UserController::class, 'login']);
-    Route::post('/register', [UserController::class, 'register']);
-    Route::post('/getCode', [UserController::class, 'getCodeOTP']);
-    Route::post('/checkCode', [UserController::class, 'checkOTP']);
-    Route::post('/getHistory', [UserController::class, 'getHistory']);
-    Route::post('/storePost', [PostController::class, 'store']);
-    Route::get('/getAllPost', [PostController::class, 'index']);
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/authOTPRoom', [UserController::class, 'authOTPRoom']);
+Route::post('/getCode', [UserController::class, 'getCodeOTP']);
+Route::post('/checkCode', [UserController::class, 'checkOTP']);
+Route::post('/getHistory', [UserController::class, 'getHistory']);
+Route::post('/storePost', [PostController::class, 'store']);
+Route::get('/getAllPost', [PostController::class, 'index']);
 
-    Route::post('/sendAmount', [PostCommentController::class, 'store']);
-    Route::post('/show', [PostCommentController::class, 'show']);
-    Route::post('/storeEndTime', [PostCommentController::class, 'storeEndTime']);
+Route::post('/sendAmount', [PostCommentController::class, 'store']);
+Route::post('/show', [PostCommentController::class, 'show']);
+Route::post('/storeEndTime', [PostCommentController::class, 'storeEndTime']);
 
-Route::group(['middleware'=>'auth'], function () {
+Route::group(['middleware' => 'auth'], function () {
 
 
 });

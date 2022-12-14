@@ -15,30 +15,38 @@ class UserController extends Controller
 {
 
     use RefeshTokenTrait;
+
     public function login(Request $request)
     {
 
         return $this->loginUser($request->username, $request->password);
     }
 
-    public function getCodeOTP(StorePaymentRequest $request)
-
+    public function authOTPRoom(Request $request)
     {
 
-        return  $this->getCode($request->id);
+        return $this->authenticationCode($request->id, $request->code);
+
     }
+
+    public function getCodeOTP(StorePaymentRequest $request)
+    {
+
+        return $this->getCode($request->id);
+    }
+
     public function checkOTP(Request $request)
 
     {
 
-        return  $this->checkCode($request->id,$request->token,$request->amount,$request->desc,$request->fromAc,$request->toAc);
+        return $this->checkCode($request->id, $request->token, $request->amount, $request->desc, $request->fromAc, $request->toAc);
     }
+
     public function register(StoreUserRequest $request)
     {
-
-
-      return $this->registerUser($request->username, $request->password,$request->phone,$request->identityNumber,$request->fullName);
+        return $this->registerUser($request->username, $request->password, $request->phone, $request->identityNumber, $request->fullName);
     }
+
     public function getHistory(Request $request)
     {
         return $this->getHistoryPayment($request->accountNumber);

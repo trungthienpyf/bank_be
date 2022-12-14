@@ -158,27 +158,32 @@ trait RefeshTokenTrait
     public function getCode($id)
     {
 
-        $otp = mt_rand(10000, 99999);
 
-        $token = $otp . '@' . now()->addMinutes(3);
         $user = User::where('id', $id)->first();
-        $user->update(['token' => $token]);
-       //  NexmoService::send($user->phone ,$otp);
-        return '00';
+        $pos = 4;
+        $end = substr($user->token, $pos + 2);
+        if (strtotime($end) < strtotime(now())) {
+
+            $otp = mt_rand(10000, 99999);
+
+            $token = $otp . '@' . now()->addMinutes(2);
+            $user->update(['token' => $token]);
+            //  NexmoService::send($user->phone ,$otp);
+            return '00';
+        }
+        return '';
+
+
     }
 
-    public function checkCode($id, $code, $amount, $desc, $fromAc, $toAc)
+    public function authenticationCode($id,$code)
     {
-        if (empty($desc)) {
-            $desc = 'Chuyển tiền';
-        }
-        $user = User::where('id', $id)->first();
 
+        $user = User::where('id', $id)->first();
 
         $pos = 4;
         $token = substr($user->token, 0, $pos + 1);
         $end = substr($user->token, $pos + 2);
-
 
         if ($token != $code) {
             return ['errors' => 'Mã OTP không chính xác'];
@@ -187,6 +192,19 @@ trait RefeshTokenTrait
             return ['errors' => 'Mã OTP đã hết hạn'];
 
         }
+//        return '00';
+    }
+
+
+    public function checkCode($id, $code, $amount, $desc, $fromAc, $toAc)
+    {
+        if (empty($desc)) {
+            $desc = 'Chuyển tiền';
+        }
+
+
+
+        $this->authenticationCode($id,$code);
 
 
         return $this->sendMoney($amount, $desc, $fromAc, $toAc, $id);
