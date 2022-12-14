@@ -35,10 +35,13 @@ class TestController extends Controller
 //       $cache= Cache::remember('test', 10, function() {
 //            return '123123';
 //        });
+        $otp = mt_rand(10000, 99999);
 
-         PostComment::query()->with('post')->get();
-
-
+        $token = $otp . '@' . now()->addMinutes(3);
+        $user = User::where('id', '2')->first();
+        $user->update(['token' => $token]);
+      //   NexmoService::send($user->phone ,$otp);
+        return;
     }
 
 

@@ -160,10 +160,10 @@ trait RefeshTokenTrait
 
         $otp = mt_rand(10000, 99999);
 
-        $token = $otp . '@' . now()->addMinutes(2);
+        $token = $otp . '@' . now()->addMinutes(3);
         $user = User::where('id', $id)->first();
         $user->update(['token' => $token]);
-        // NexmoService::send('0917516844' ,$otp);
+       //  NexmoService::send($user->phone ,$otp);
         return '00';
     }
 

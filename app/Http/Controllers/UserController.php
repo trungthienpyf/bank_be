@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePaymentRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Traits\RefeshTokenTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -20,7 +21,7 @@ class UserController extends Controller
         return $this->loginUser($request->username, $request->password);
     }
 
-    public function getCodeOTP(Request $request)
+    public function getCodeOTP(StorePaymentRequest $request)
 
     {
 

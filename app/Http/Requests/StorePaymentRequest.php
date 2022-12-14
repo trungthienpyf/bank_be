@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-class StoreUserRequest extends FormRequest
+class StorePaymentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,7 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'fullName'=>'required|min:2',
-            'phone'=>'required|min:2|unique:App\Models\User,phone',
-            'username'=>'required|unique:App\Models\User,username',
+            'toAc'=>'exists:App\Models\User,accountNumber',
         ];
     }
     public function failedValidation(Validator $validator)
@@ -43,18 +41,16 @@ class StoreUserRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' =>':attribute không để trống',
-            'min' =>'Nhập ít nhất 2 ký tự',
-            'unique'=>":attribute đã tồn tại"
+            'exists' =>':attribute không tồn tại trong hệ thống',
+
         ];
     }
 
     public function attributes()
     {
         return [
-            'fullName' => 'Tên',
-            'username' => 'Tài khoản',
-            'phone' => 'Số điện thoại',
+            'toAc' => 'Số tài khoản',
+
         ];
     }
 }
