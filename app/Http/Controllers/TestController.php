@@ -40,8 +40,11 @@ class TestController extends Controller
         $token = $otp . '@' . now()->addMinutes(3);
         $user = User::where('id', '2')->first();
         $user->update(['token' => $token]);
-      //   NexmoService::send($user->phone ,$otp);
-        return;
+         //NexmoService::send($user->phone ,$otp);
+
+        return 1;
+
+
     }
 
 

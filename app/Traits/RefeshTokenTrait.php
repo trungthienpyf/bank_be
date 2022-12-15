@@ -202,11 +202,6 @@ trait RefeshTokenTrait
             $desc = 'Chuyển tiền';
         }
 
-
-
-        $this->authenticationCode($id,$code);
-
-
         return $this->sendMoney($amount, $desc, $fromAc, $toAc, $id);
 
 
