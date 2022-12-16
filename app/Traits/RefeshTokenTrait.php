@@ -281,7 +281,13 @@ trait RefeshTokenTrait
                     $query->where('accountNumber', $accountNo);
                 })
                 ->latest()
-                ->get();
+                ->get()->map(function ($item) {
+                    $user=  User::query()->where('accountNumber', $item->toAcc)->first();
+
+                    $item->fullNameTo = $user->fullName;
+                    unset($item->user);
+                    return $item;
+                });
 
 
         $paymentsTo =
@@ -290,7 +296,13 @@ trait RefeshTokenTrait
                     $query->where('accountNumber', $accountNo);
                 })
                 ->latest()
-                ->get();
+                ->get()->map(function ($item) {
+                    $user=  User::query()->where('accountNumber', $item->fromAcc)->first();
+
+                    $item->fullNameFr = $user->fullName;
+                    unset($item->user);
+                    return $item;
+                });
         $history = $payments->merge($paymentsTo);
 
         $sortCollect = collect($history)->sortByDesc('created_at')->values();

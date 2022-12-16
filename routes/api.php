@@ -25,7 +25,11 @@ Route::post('/getCode', [UserController::class, 'getCodeOTP']);
 Route::post('/checkCode', [UserController::class, 'checkOTP']);
 Route::post('/getHistory', [UserController::class, 'getHistory']);
 Route::post('/storePost', [PostController::class, 'store']);
+Route::post('/checkPhone', [UserController::class, 'checkPhone']);
 Route::get('/getAllPost', [PostController::class, 'index']);
+Route::get('/getAllUser', [UserController::class, 'getAllUser']);
+Route::post('/showPostUser', [PostController::class, 'showPostUser']);
+Route::post('/showPostReward', [PostController::class, 'showPostReward']);
 
 Route::post('/sendAmount', [PostCommentController::class, 'store']);
 Route::post('/show', [PostCommentController::class, 'show']);

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePaymentRequest;
+use App\Http\Requests\StoreRegisterRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Models\User;
 use App\Traits\RefeshTokenTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -27,6 +29,21 @@ class UserController extends Controller
 
         return $this->authenticationCode($request->id, $request->code);
 
+    }
+    public function getAllUser()
+    {
+        return User::all()->map(function ($user) {
+            return [
+                'id'=>$user->id,
+                'value' => $user->accountNumber,
+                'label' => $user->fullName . ' - ' . $user->accountNumber,
+//                'email' => $user->email,
+
+            ];
+        });
+    }
+    public function checkPhone(StoreRegisterRequest $request){
+        return '00';
     }
 
     public function getCodeOTP(StorePaymentRequest $request)
